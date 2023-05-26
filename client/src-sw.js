@@ -19,21 +19,6 @@ const pageCache = new CacheFirst({
   ],
 });
 
-offlineFallback({
-  cacheName: "offline-cache",
-  fallbackHTML: "<h1>You are offline</h1>",
-  fallbacks: [
-    {
-      urlPattern: /\.(?:png|jpg|jpeg|svg|gif)$/,
-      response: "<img src='/offline-image.png'>",
-    },
-    {
-      urlPattern: /\.(?:js|css)$/,
-      response: "",
-    },
-  ],
-});
-
 warmStrategyCache({
   urls: ["/index.html", "/"],
   strategy: pageCache,
@@ -43,8 +28,7 @@ registerRoute(({ request }) => request.mode === "navigate", pageCache);
 
 // TODO: Implement asset caching
 registerRoute(
-  ({ request }) =>
-    request.destination === "style" || request.destination === "script",
+  ({ request }) => ["style", "script", "worker"].includes(request.destination),
   new CacheFirst({
     cacheName: "assets-cache",
     plugins: [
